@@ -3,13 +3,19 @@ class MinimaxAgent extends Agent {
         super(); // Llama al constructor de la clase base "Agent".
         this.boardUtil = new Board(); // Utilidad para interactuar con el tablero.
         this.maxDepth = 6; // Profundidad máxima para explorar el árbol de decisiones.
+        this.totalTime = 0; //Se almacena el tiemo inicial
         //this.memo = new Map(); // Almacenar evaluaciones de tableros        
     }
 
     compute(board, move_state, time) {
-        console.log('Movimiento:', move_state);
         //console.log('Board state:', board);
         //console.log('Remaining time:', time);
+
+        // Si es la primera vez que se llama a compute, guardamos el tiempo inicial
+        if (this.totalTime === 0) {
+            this.totalTime = time;
+            console.log('Tiempo inicial:', this.totalTime);  // Solo muestra el tiempo inicial la primera vez
+        }
 
         const validMoves = this.boardUtil.valid_moves(board); // Obtiene los movimientos válidos.
         if (!Array.isArray(validMoves) || validMoves.length === 0) {
@@ -20,15 +26,15 @@ class MinimaxAgent extends Agent {
         // Maneja diferentes estados del movimiento para elegir la acción adecuada.
         switch (move_state) {
             case '1':
-                return this.handleFirstMove(validMoves);
+                return this.handleFirstMove(board, validMoves);
             case '2':
-                return this.handleSecondMove(validMoves);
+                return this.handleSecondMove(board, validMoves);
             case '3':
-                return this.handleThirdMove(validMoves);
+                return this.handleThirdMove(board, validMoves);
             case 'W':
             case 'B':
-                console.log('Handling move_state', move_state);
-                return this.handleRegularMove(board, move_state, validMoves);
+                console.log('Handling move_state ', move_state);
+                return this.handleRegularMove(board,time, move_state, validMoves);
             default:
                 console.error('Unknown move_state:', move_state);
                 return null;
@@ -36,43 +42,60 @@ class MinimaxAgent extends Agent {
     }
 
     // Maneja el primer movimiento especial seleccionando tres jugadas al azar.
-    handleFirstMove(validMoves) {
+    handleFirstMove(board, validMoves) {
         console.log('Handling first move');
         if (validMoves.length < 3) {
             console.error('Not enough valid moves for the first move:', validMoves);
             return null;
         }
-        // Selecciona los primeros tres movimientos válidos de manera random
-        const randomMoves = [...validMoves].sort(() => 0.5 - Math.random()).slice(0, 3);
-        console.log('First move selected:', randomMoves);
-        // Asegúrate de que los movimientos seleccionados sean válidos
-        if (randomMoves.length !== 3) {
-            console.error('Invalid first move selection:', randomMoves);
-            return null;
-        }
-        // Devuelve los movimientos seleccionados
-        return randomMoves;
+    
+        // Prioriza el centro del tablero
+        const center = Math.floor(board.length / 2);
+        const bestMoves = [
+            [center, center], // Centro del tablero
+            [center - 1, center], // A la izquierda del centro
+            [center + 1, center + 1] // Diagonal superior derecha
+        ];
+    
+        console.log('First move selected:', bestMoves);
+        return bestMoves;
     }
     
     // Maneja el segundo movimiento especial con probabilidades variadas.
-    handleSecondMove(validMoves) {
+    handleSecondMove(board, validMoves) {
         console.log('Handling second move');
-        const random = Math.random();
-
-        if (random < 0.33) {// Opción 1: Devuelve 'BLACK'.
+    
+        // Evalúa la configuración del tablero
+        const blackAdvantage = this.evaluateBoard(board, 'B');
+        const whiteAdvantage = this.evaluateBoard(board, 'W');
+    
+        // Si las negras tienen una ventaja significativa, elige jugar con negras
+        if (blackAdvantage > whiteAdvantage + 1000) {
             console.log('Second move selected: BLACK');
             return 'BLACK';
-        } else if (random < 0.66) {// Opción 2: Movimiento aleatorio.
-            console.log('Second move selected: WHITE + WPiece');
-            return validMoves[Math.floor(Math.random() * validMoves.length)];
-        } else {// Opción 3: Devuelve dos movimientos al azar.
-            console.log('Second move selected: 2 Pieces');
-            const randomIndices = this.getRandomIndices(validMoves.length, 2);
-            return [
-                validMoves[randomIndices[0]],
-                validMoves[randomIndices[1]]
-            ];
         }
+        // Si las blancas tienen una ventaja significativa, elige jugar con blancas
+        else if (whiteAdvantage > blackAdvantage + 1000) {
+            console.log('Second move selected: WHITE');
+            return 'WHITE';
+        }
+        // Si no hay una ventaja clara, coloca 2 piedras adicionales
+        else {
+            console.log('Second move selected: 2 Pieces');
+            const bestMoves = this.selectBestMoves(validMoves, board, 2);
+            return bestMoves;
+        }
+    }
+    
+    // Función para seleccionar los mejores movimientos
+    selectBestMoves(validMoves, board, count) {
+        const scoredMoves = validMoves.map(move => ({
+            move,
+            score: this.evaluateBoard(board, 'B') // Evaluar desde la perspectiva de las negras
+        }));
+        console.log('Scored moves:', scoredMoves);
+        scoredMoves.sort((a, b) => b.score - a.score);
+        return scoredMoves.slice(0, count).map(m => m.move);
     }
     getRandomIndices(length, count) {
         const indices = [];
@@ -86,34 +109,49 @@ class MinimaxAgent extends Agent {
     }
 
     // Maneja el tercer movimiento especial con probabilidad del 50%.
-    handleThirdMove(validMoves) {
+    handleThirdMove(board, validMoves) {
         console.log('Handling third move');
-        return Math.random() < 0.5 ? 'BLACK' : validMoves[Math.floor(Math.random() * validMoves.length)];
+    
+        // Evalúa la configuración del tablero
+        const blackAdvantage = this.evaluateBoard(board, 'B');
+        const whiteAdvantage = this.evaluateBoard(board, 'W');
+    
+        // Si las negras tienen una ventaja significativa, elige jugar con negras
+        if (blackAdvantage > whiteAdvantage + 500) {
+            console.log('Third move selected: BLACK');
+            return 'BLACK';
+        }
+        // De lo contrario, coloca una piedra adicional en la mejor posición
+        else {
+            console.log('Third move selected: Piece');
+            const bestMove = this.selectBestMoves(validMoves, board, 1)[0];
+            return bestMove;
+        }
     }
 
     // Maneja los movimientos regulares aplicando el algoritmo Minimax.
     //Profundidad dinámica dependiendo de la cantidad de tiempo restante.
-    handleRegularMove(board, move_state, validMoves) {
-        console.log('Handling regular move');
+    handleRegularMove(board,time, move_state, validMoves) {
         const color = move_state === 'W' ? 'W' : 'B';
 
         // Ajustar la profundidad según el tiempo restante
-        if (time < this.time / 20) {
+        if (time < this.totalTime / 20) {
             console.log('Modo de emergencia: movimiento aleatorio');
             return validMoves[Math.floor(Math.random() * validMoves.length)];
-        } else if (time < this.time / 10) {
+        } else if (time < this.totalTime / 10) {
             console.log('Tiempo /10');
             this.maxDepth = 1;
-        } else if (time < this.time / 4) {
+        } else if (time < this.totalTime / 4) {
             console.log('Tiempo /4');
             this.maxDepth = 3;
-        } else if (time < this.time / 2) {
+        } else if (time < this.totalTime / 2) {
             console.log('Tiempo /2');
             this.maxDepth = 5;
         }else{
-            console.log('Tiempo normal');
+            console.log('Time:', time);
+            console.log('totalTime:', this.totalTime);
         }
-    
+        
         return this.getBestMove(board, color, validMoves);
     }
 
@@ -164,7 +202,7 @@ class MinimaxAgent extends Agent {
         // Devolver solo los movimientos (sin la puntuación)
         return scoredMoves.map(scoredMove => scoredMove.move);
     }
-/////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////
     calculateMoveScore(board, move, color) {
         const [x, y] = move;
         let score = 0;
@@ -243,19 +281,54 @@ class MinimaxAgent extends Agent {
     evaluateBoard(board, color) {
         const opponentColor = color === 'W' ? 'B' : 'W';
         return (
-            this.evaluateLines(board, color, 5) * 1000 -
+            this.evaluateLines(board, color, 5) * 1000 - // Líneas de 5 piedras
             this.evaluateLines(board, opponentColor, 5) * 1000 +
-            this.evaluateLines(board, color, 4) * 500 -
+            this.evaluateLines(board, color, 4) * 500 - // Líneas de 4 piedras
             this.evaluateLines(board, opponentColor, 4) * 500 +
-            this.evaluateLines(board, color, 3) * 100 -
-            this.evaluateLines(board, opponentColor, 3) * 100
+            this.evaluateLines(board, color, 3) * 100 - // Líneas de 3 piedras
+            this.evaluateLines(board, opponentColor, 3) * 100 +
+            this.evaluateCenterControl(board, color) * 50 // Control del centro
         );
     }
 
     evaluateLines(board, color, length) {
-        return this.boardUtil.valid_moves(board).reduce((count, move) => {
-            return count + (this.boardUtil.check(board, move[0], move[1]) ? 1 : 0);
-        }, 0);
+        let count = 0;
+        for (let y = 0; y < board.length; y++) {
+            for (let x = 0; x < board.length; x++) {
+                if (board[y][x] === color) {
+                    // Verificar en todas las direcciones (horizontal, vertical, diagonal)
+                    if (this.checkLine(board, x, y, 1, 0, length, color)) count++; // Horizontal
+                    if (this.checkLine(board, x, y, 0, 1, length, color)) count++; // Vertical
+                    if (this.checkLine(board, x, y, 1, 1, length, color)) count++; // Diagonal derecha
+                    if (this.checkLine(board, x, y, 1, -1, length, color)) count++; // Diagonal izquierda
+                }
+            }
+        }
+        return count;
+    }
+
+    checkLine(board, x, y, dx, dy, length, color) {
+        for (let i = 0; i < length; i++) {
+            const newX = x + i * dx;
+            const newY = y + i * dy;
+            if (newX < 0 || newX >= board.length || newY < 0 || newY >= board.length || board[newY][newX] !== color) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    evaluateCenterControl(board, color) {
+        const center = Math.floor(board.length / 2);
+        let score = 0;
+        for (let y = center - 2; y <= center + 2; y++) {
+            for (let x = center - 2; x <= center + 2; x++) {
+                if (board[y][x] === color) {
+                    score += 1;
+                }
+            }
+        }
+        return score;
     }
     
 }
