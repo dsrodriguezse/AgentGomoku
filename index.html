@@ -13,7 +13,9 @@
 	<script type='text/javascript' src='https://jgomezpe.github.io/konekti/src/konekti.js'></script>
 	<script type='text/javascript' src='gomoku.js'></script>
 	<script type='text/javascript' src='agent/algMinimax.js'></script>
-
+	<script type='text/javascript' src='agent/estraDs.js'></script>
+	<!--<script type='text/javascript' src='agent/estraGPT.js'></script>
+	-->
 </head>
 
 <body>
@@ -32,7 +34,15 @@ function KonektiMain(){
 
 		/*Jugadores inteligentes a colocar/probar en el tablero*/
 		'bak': new MinimaxAgent(), //AlgMinimax --> BEST
-		'bak2': new MinimaxAgent() //AlgMinimax --> BEST
+		'bak2': new MinimaxAgent(), //AlgMinimax --> BEST
+		/*
+		//Jugadores inteligentes a colocar/probar en el tablero
+		'gpt': new MinimaxAgentGPT(), //AlgMinimax --> BEST
+		'gpt2': new MinimaxAgentGPT(), //AlgMinimax --> BEST
+		*/
+		/*Jugadores inteligentes a colocar/probar en el tablero*/
+		'ds': new MinimaxAgentDS(), //AlgMinimax --> BEST
+		'ds2': new MinimaxAgentDS() //AlgMinimax --> BEST
     })
 
 	Konekti.header('title','', 'Gomoku', 3, {'class':'w3-black w3-center'} )

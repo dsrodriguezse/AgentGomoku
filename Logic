@@ -1,0 +1,33 @@
+~ Lógica Swap2{
+  <> 1° movimiento{
+    <> Return FICHA N, RICHA N, FICHA B
+  }
+  ~ 2° movimiento{
+    >> Retornar 'BLACK' si tiene ventaja
+    ~ return FICHA B y juega BLANCO
+    >> return FICHA B y FICHA N 
+  }
+  ~ 3° movimiento{
+    >> Si elige jugar negro, return 'BLACK'
+    ~ Si elige jugar blanco, return FICHA B    
+  {
+}
+
+~ MINIMAX
+
+~ Seleccionar mejores movimientos
+~ Obtener mejor movimiento
+~ Priorización de movimientos
+
+~ Obtener movimientos ordenados
+~ Movimientos prioritarios
+
+~ Evaluar tablero (asigna puntajes)
+~ Evaluar lineas
+
+~ Estrategias{
+  ~ Jugar en el centro
+  ~ Pescadito
+  ~ Evaluar linea individual
+}
+<> Profundidad dinámica dependiendo del tiempo
