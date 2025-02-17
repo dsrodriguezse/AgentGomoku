@@ -8,13 +8,13 @@ class MinimaxAgentDSEnemy extends Agent {
     }
 
     compute(board, move_state, time) {
-        //console.log('Board state:', board);
-        //console.log('Remaining time:', time);
+        ////console.log('Board state:', board);
+        ////console.log('Remaining time:', time);
 
         // Si es la primera vez que se llama a compute, guardamos el tiempo inicial
         if (this.totalTime === 0) {
             this.totalTime = time;
-            console.log('Tiempo inicial:', this.totalTime);  // Solo muestra el tiempo inicial la primera vez
+            //console.log('Tiempo inicial:', this.totalTime);  // Solo muestra el tiempo inicial la primera vez
         }
 
         const validMoves = this.boardUtil.valid_moves(board); // Obtiene los movimientos válidos.
@@ -33,7 +33,7 @@ class MinimaxAgentDSEnemy extends Agent {
                 return this.handleThirdMove(board, validMoves);
             case 'W':
             case 'B':
-                console.log('Handling move_state ', move_state);
+                //console.log('Handling move_state ', move_state);
                 return this.handleRegularMove(board,time, move_state, validMoves);
             default:
                 console.error('Unknown move_state:', move_state);
@@ -42,7 +42,7 @@ class MinimaxAgentDSEnemy extends Agent {
     }
 
     handleFirstMove(board, validMoves) {
-        console.log('Handling first move');
+        //console.log('Handling first move');
     
         if (validMoves.length < 3) {
             console.error('Not enough valid moves for the first move:', validMoves);
@@ -80,35 +80,35 @@ class MinimaxAgentDSEnemy extends Agent {
             }
         }
     
-        console.log('First move selected:', selectedMoves);
+        //console.log('First move selected:', selectedMoves);
         return selectedMoves;
     }
     
     
     // Maneja el segundo movimiento especial con probabilidades variadas.
     handleSecondMove(board, validMoves) {
-        console.log('Handling second move');
+        //console.log('Handling second move');
     
         // Evalúa la configuración del tablero
         const blackAdvantage = this.evaluateBoard(board, 'B');
         const whiteAdvantage = this.evaluateBoard(board, 'W');
-        console.log('2Black advantage:', blackAdvantage);
-        console.log('2White advantage:', whiteAdvantage);
+        //console.log('2Black advantage:', blackAdvantage);
+        //console.log('2White advantage:', whiteAdvantage);
     
         // Si las negras tienen una ventaja significativa, elige jugar con negras
         if (blackAdvantage > whiteAdvantage + 45000) {
-            console.log('Second move selected: BLACK');
+            //console.log('Second move selected: BLACK');
             return 'BLACK';
         }
         // Si las blancas tienen una ventaja significativa, elige jugar con blancas
         else if (whiteAdvantage > blackAdvantage - 45000) {
-            console.log('Second move selected: WHITE');
+            //console.log('Second move selected: WHITE');
             const bestMove = this.selectBestMoves(validMoves, board, 1)[0];
             return bestMove;
         }
         // Si no hay una ventaja clara, coloca 2 piedras adicionales
         else {
-            console.log('Second move selected: 2 Pieces');
+            //console.log('Second move selected: 2 Pieces');
             const bestMoves = this.selectBestMoves(validMoves, board, 2);
             return bestMoves;
         }
@@ -120,28 +120,28 @@ class MinimaxAgentDSEnemy extends Agent {
             move,
             score: this.evaluateBoard(board, 'B') // Evaluar desde la perspectiva de las negras
         }));
-        //console.log('Scored moves:', scoredMoves);
+        ////console.log('Scored moves:', scoredMoves);
         scoredMoves.sort((a, b) => b.score - a.score);
         return scoredMoves.slice(0, count).map(m => m.move);
     }
 
     handleThirdMove(board, validMoves) {
-        console.log('Handling third move');
+        //console.log('Handling third move');
     
         // Evalúa la configuración del tablero
         const blackAdvantage = this.evaluateBoard(board, 'B');
         const whiteAdvantage = this.evaluateBoard(board, 'W');
-        console.log('3Black advantage:', blackAdvantage);
-        console.log('3White advantage:', whiteAdvantage);
+        //console.log('3Black advantage:', blackAdvantage);
+        //console.log('3White advantage:', whiteAdvantage);
     
         // Si las negras tienen una ventaja significativa, elige jugar con negras
         if (blackAdvantage > whiteAdvantage + 5000) {
-            console.log('Third move selected: BLACK');
+            //console.log('Third move selected: BLACK');
             return 'BLACK';
         }
         // De lo contrario, coloca una piedra adicional en la mejor posición
         else {
-            console.log('Third move selected: Piece');
+            //console.log('Third move selected: Piece');
             const bestMove = this.selectBestMoves(validMoves, board, 1)[0];
             return bestMove;
         }
@@ -156,23 +156,23 @@ class MinimaxAgentDSEnemy extends Agent {
 
         // Ajustar la profundidad según el tiempo restante
         if (time < this.totalTime / 30) {
-            console.log('Modo de emergencia: movimiento aleatorio');
+            //console.log('Modo de emergencia: movimiento aleatorio');
             return validMoves[Math.floor(Math.random() * validMoves.length)];
         } else if (time < this.totalTime / 10) {
-            console.log('Tiempo /10');
+            //console.log('Tiempo /10');
             this.maxDepth = 1;
         } else if (time < this.totalTime / 4) {
-            console.log('Tiempo /4');
+            //console.log('Tiempo /4');
             this.maxDepth = 3;
         } else if (time < this.totalTime / 2) {
-            console.log('Tiempo /2');
+            //console.log('Tiempo /2');
             this.maxDepth = 5;
         } else if (hasImmediateThreat) {
             this.maxDepth = 7; // Mayor profundidad para amenazas inminentes
         }else{
             this.maxDepth = 6; // Profundidad normal
-            console.log('Time:', time);
-            //console.log('totalTime:', this.totalTime);
+            //console.log('Time:', time);
+            ////console.log('totalTime:', this.totalTime);
         }
 
         return this.getBestMove(board, color, validMoves);
@@ -216,7 +216,7 @@ class MinimaxAgentDSEnemy extends Agent {
             alpha = Math.max(alpha, bestValue); // Actualiza alfa para la poda.
             if (beta <= alpha) break; // Corta la evaluación si alfa-beta ya no tiene sentido.
         }
-        //console.log('Best move:', bestMove);
+        ////console.log('Best move:', bestMove);
         return bestMove;
     }
 
@@ -328,7 +328,7 @@ class MinimaxAgentDSEnemy extends Agent {
             closeEnemy1: Math.pow(500000, this.evaluateLinesEnemy(board, color, 3) + this.evaluateLinesEnemy(board, color, 4))
         };
     
-        //console.log(`Evaluación de ${color}:`, scores);
+        ////console.log(`Evaluación de ${color}:`, scores);
     
         return Object.values(scores).reduce((a, b) => a + b, 0);
     }
@@ -382,7 +382,7 @@ class MinimaxAgentDSEnemy extends Agent {
                 }
             }
         }
-        //console.log(`Lines of length ${length} for color ${color}: ${count}`);
+        ////console.log(`Lines of length ${length} for color ${color}: ${count}`);
         return count*10;
     }
     
