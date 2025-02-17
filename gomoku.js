@@ -150,8 +150,8 @@ class RandomPlayer extends Agent{
     }
 
     compute(board, move_state, time){
-        for(var i=0; i<50000000; i++){} // Making it very slow to test time restriction
-        for(var i=0; i<50000000; i++){} // Making it very slow to test time restriction
+        for(var i=0; i<200000000; i++){} // Making it very slow to test time restriction
+        for(var i=0; i<200000000; i++){} // Making it very slow to test time restriction
         var moves = this.board.valid_moves(board)
         var index1, index2, index3
         var r
@@ -170,7 +170,7 @@ class RandomPlayer extends Agent{
             break;
             case '2':
                 r = Math.random()
-                if(r<0.33333) return 'BLACK'
+                if(r<0.9999933333) return 'BLACK'
                 if(r<0.66666){
                     index1 = Math.floor(moves.length * Math.random())
                     return moves[index1]
@@ -184,7 +184,7 @@ class RandomPlayer extends Agent{
             break;
             case '3':
                 r = Math.random()
-                if(r<0.5) return 'BLACK'
+                if(r<0.0000005) return 'BLACK'
                 index1 = Math.floor(moves.length * Math.random())
                 return moves[index1]
             break;
@@ -325,13 +325,16 @@ class Environment extends MainClient{
                 break;    
                 case '2':
                     action = get(x.white, b, '2')
-                    if(action == 'BLACK') swap('W')
-                    else{
+                    if(action == 'BLACK'){
+                        swap('W')
+                        x.state = 'W'
+                    }else{
                         if(action != null){
                             if(typeof action[0] == 'number'){
                                 if(!board.move(x.rb, action, 'W')){
                                     x.winner = x.black + ' ...Invalid move taken by ' + x.white + ' on position ' + action[i][0] + ',' +action[i][1] 
                                 }
+                                x.state = 'B'
                             }else{
                                 for( var i=0; i<2; i++ ){
                                     if(!board.move(x.rb, action[i], i<1?'W':'B')){
