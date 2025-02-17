@@ -315,7 +315,10 @@ class MinimaxAgentDSEnemy extends Agent {
         }
         return bestValue;
     }
+
+    
     evaluateBoard(board, color) {
+        const opponentColor = color === 'W' ? 'B' : 'W';
         const scores = {
             win5: this.evaluateLines(board, color, 5) * 10000000,
             open4: this.evaluateLines(board, color, 4, true) * 100000,
@@ -324,11 +327,9 @@ class MinimaxAgentDSEnemy extends Agent {
             closed3: this.evaluateLines(board, color, 3) * 1000,
             pescadito: this.evaluatePescadito(board, color) * 500,
             center: this.evaluateCenterControl(board, color) * 200,
-            closeEnemy1: Math.pow(500000, this.evaluateLinesEnemy(board, color, 3) + this.evaluateLinesEnemy(board, color, 4))
+            closeEnemy1: Math.pow(5000, this.evaluateLinesEnemy(board, opponentColor, 3) + this.evaluateLinesEnemy(board, opponentColor, 4))
         };
-    
-        //console.log(`Evaluación de ${color}:`, scores);
-    
+
         return Object.values(scores).reduce((a, b) => a + b, 0);
     }
     
