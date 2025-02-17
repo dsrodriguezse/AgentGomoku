@@ -103,7 +103,8 @@ class MinimaxAgentDS extends Agent {
         // Si las blancas tienen una ventaja significativa, elige jugar con blancas
         else if (whiteAdvantage > blackAdvantage - 45000) {
             console.log('Second move selected: WHITE');
-            return 'WHITE';
+            const bestMove = this.selectBestMoves(validMoves, board, 1)[0];
+            return bestMove;
         }
         // Si no hay una ventaja clara, coloca 2 piedras adicionales
         else {
