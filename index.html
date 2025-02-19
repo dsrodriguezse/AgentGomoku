@@ -12,13 +12,10 @@
 	<title>Gomoku</title>
 	<script type='text/javascript' src='https://jgomezpe.github.io/konekti/src/konekti.js'></script>
 	<script type='text/javascript' src='gomoku.js'></script>
-	<script type='text/javascript' src='agent/algMinimax.js'></script>
 	<script type='text/javascript' src='agent/estraDs.js'></script>
-	<script type='text/javascript' src='agent/estraDstwo.js'></script>
-	<script type='text/javascript' src='agent/estraDsthree.js'></script>
-	<script type='text/javascript' src='agent/estraDsfour.js'></script>
-	<script type='text/javascript' src='agent/dspro.js'></script>
 	<script type='text/javascript' src='agent/dsEnemy.js'></script>
+	<script type='text/javascript' src='agent/dsEnemy2.js'></script>
+
 	<!--<script type='text/javascript' src='agent/estraGPT.js'></script>
 	-->
 </head>
@@ -41,8 +38,11 @@ function KonektiMain(){
 		'ds': new MinimaxAgentDS(), //AlgMinimax --> BEST
 		'ds2': new MinimaxAgentDS(), //AlgMinimax --> BEST
 
-		'dsenemy1': new MinimaxAgentDSEnemy(), //AlgMinimax --> BEST
-		'dsenemy2': new MinimaxAgentDSEnemy(), //AlgMinimax --> BEST
+		'enemy1': new MinimaxAgentDSEnemy(), //AlgMinimax --> BEST
+		'enemy2': new MinimaxAgentDSEnemy(), //AlgMinimax --> BEST
+
+		'dsenemy1': new MinimaxAgentDSEnemy2(), //AlgMinimax --> BEST
+		'dsenemy2': new MinimaxAgentDSEnemy2(), //AlgMinimax --> BEST
 	})
 
 	Konekti.header('title','', 'Gomoku', 3, {'class':'w3-black w3-center'} )

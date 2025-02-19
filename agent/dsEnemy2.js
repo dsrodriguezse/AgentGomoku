@@ -1,4 +1,4 @@
-class MinimaxAgentDSEnemy extends Agent {
+class MinimaxAgentDSEnemy2 extends Agent {
     constructor() {
         super(); // Llama al constructor de la clase base "Agent".
         this.boardUtil = new Board(); // Utilidad para interactuar con el tablero.
@@ -102,9 +102,8 @@ class MinimaxAgentDSEnemy extends Agent {
         }
         // Si las blancas tienen una ventaja significativa, elige jugar con blancas
         else if (whiteAdvantage > blackAdvantage - 45000) {
-            //console.log('Second move selected: WHITE');
             const bestMove =this.handleRegularMove(board,time,  'W', validMoves);
-            return bestMove;
+            return bestMove
         }
         // Si no hay una ventaja clara, coloca 2 piedras adicionales
         else {
@@ -235,8 +234,10 @@ class MinimaxAgentDSEnemy extends Agent {
         // Devolver solo los movimientos (sin la puntuación)
         return scoredMoves.map(scoredMove => scoredMove.move);
     }
+
+    
     prioritizeMoves(board, validMoves, color) {
-        // Priorizar movimientos cercanos a fichas existentes del color dado
+        const opponentColor = color === 'W' ? 'B' : 'W';
         const scoredMoves = validMoves.map(move => {
             const [x, y] = move;
             let score = 0;
@@ -257,6 +258,11 @@ class MinimaxAgentDSEnemy extends Agent {
                 }
             }
     
+            // Verificar si el movimiento bloquea una línea abierta de 3 piezas del enemigo
+            if (this.blocksOpenThree(board, x, y, opponentColor)) {
+                score += 50000; // Asignar una puntuación alta por bloquear una línea abierta de 3 piezas del enemigo
+            }
+    
             return { move, score };
         });
     
@@ -265,6 +271,45 @@ class MinimaxAgentDSEnemy extends Agent {
     
         // Devolver solo los movimientos (sin la puntuación)
         return scoredMoves.map(scoredMove => scoredMove.move);
+    }
+    
+    // Nueva función para verificar si un movimiento bloquea una línea abierta de 3 piezas del enemigo
+    blocksOpenThree(board, x, y, opponentColor) {
+        const directions = [
+            { dx: 1, dy: 0 }, // Horizontal
+            { dx: 0, dy: 1 }, // Vertical
+            { dx: 1, dy: 1 }, // Diagonal derecha
+            { dx: 1, dy: -1 } // Diagonal izquierda
+        ];
+    
+        for (const { dx, dy } of directions) {
+            let count = 0;
+            let openStart = false, openEnd = false;
+    
+            // Verificar en ambas direcciones
+            for (let i = -3; i <= 3; i++) {
+                const newX = x + i * dx;
+                const newY = y + i * dy;
+                if (newX < 0 || newX >= board.length || newY < 0 || newY >= board.length) continue;
+    
+                if (board[newY][newX] === opponentColor) {
+                    count++;
+                } else if (board[newY][newX] === ' ') {
+                    if (i < 0) openStart = true;
+                    if (i > 0) openEnd = true;
+                } else {
+                    count = 0;
+                    openStart = false;
+                    openEnd = false;
+                }
+    
+                if (count === 3 && openStart && openEnd) {
+                    return true; // Bloquea una línea abierta de 3 piezas del enemigo
+                }
+            }
+        }
+    
+        return false;
     }
 
     getSortedMoves(board) {
